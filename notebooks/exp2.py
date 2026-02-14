@@ -38,9 +38,9 @@ def fill_missing_with_median(df):
 train_processed_data = fill_missing_with_median(train_data)
 test_processed_data = fill_missing_with_median(test_data)
 
-X_train = train_processed_data.drop(columns=["Potability"], axis=1)
+X_train = train_processed_data.drop(columns=["Potability"])
 y_train = train_processed_data["Potability"]
-X_test = test_processed_data.drop(columns=["Potability"], axis=1)
+X_test = test_processed_data.drop(columns=["Potability"])
 y_test = test_processed_data["Potability"]
 
 models = {
@@ -86,6 +86,6 @@ with mlflow.start_run(run_name="Water Potability Models Experiment"):
     
             mlflow.log_artifact(__file__)
     
-            mlflow.set_tag("author", "datathinkers")
+            mlflow.set_tag("author", "Abdelrahman Farouk")
     
     print("All models have been trained and logged as child runs successfully.")
