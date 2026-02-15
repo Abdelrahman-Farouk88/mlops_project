@@ -112,11 +112,6 @@ dvc repro
 streamlit run app.py
 ```
 
-### Push data to remote
-```bash
-dvc push
-```
-
 ## Water Quality Parameters
 
 | Parameter | Description | Unit |
