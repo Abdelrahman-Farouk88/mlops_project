@@ -66,7 +66,6 @@ myenv\Scripts\activate  # Windows
 
 # Install dependencies
 pip install -r requirements.txt
-pip install streamlit dvc mlflow dagshub scikit-learn pandas seaborn matplotlib pyyaml
 ```
 
 ## DagsHub Configuration

@@ -8,3 +8,19 @@ coverage
 awscli
 flake8
 python-dotenv>=0.5.1
+
+# ML & Data
+scikit-learn
+pandas
+numpy
+matplotlib
+seaborn
+pyyaml
+
+# MLOps
+mlflow
+dagshub
+dvc
+
+# Web Interface
+streamlit
