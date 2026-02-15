@@ -56,7 +56,7 @@ The DVC pipeline runs 5 stages in sequence:
 
 ```bash
 # Clone the repository
-git clone https://dagshub.com/Abdelrahman-Farouk88/mlops_project.git
+git clone https://github.com/Abdelrahman-Farouk88/mlops_project.git
 cd mlops_project
 
 # Create virtual environment
@@ -66,10 +66,42 @@ myenv\Scripts\activate  # Windows
 
 # Install dependencies
 pip install -r requirements.txt
-pip install streamlit
+pip install streamlit dvc mlflow dagshub scikit-learn pandas seaborn matplotlib pyyaml
+```
+
+## DagsHub Configuration
+
+This project uses DagsHub for experiment tracking and DVC remote storage. To set up:
+
+1. Create a free account at [dagshub.com](https://dagshub.com)
+2. Fork this repo on DagsHub: [Abdelrahman-Farouk88/mlops_project](https://dagshub.com/Abdelrahman-Farouk88/mlops_project)
+3. Get your access token from **DagsHub → Settings → Tokens**
+4. Configure DVC remote authentication:
+
+```bash
+dvc remote modify myremote --local auth basic
+dvc remote modify myremote --local user <YOUR_DAGSHUB_USERNAME>
+dvc remote modify myremote --local password <YOUR_DAGSHUB_TOKEN>
+```
+
+5. Set DagsHub environment variables (optional, for MLflow auth):
+
+```bash
+# Windows
+set MLFLOW_TRACKING_USERNAME=<YOUR_DAGSHUB_USERNAME>
+set MLFLOW_TRACKING_PASSWORD=<YOUR_DAGSHUB_TOKEN>
+
+# Linux/Mac
+export MLFLOW_TRACKING_USERNAME=<YOUR_DAGSHUB_USERNAME>
+export MLFLOW_TRACKING_PASSWORD=<YOUR_DAGSHUB_TOKEN>
 ```
 
 ## Usage
+
+### Pull data from remote
+```bash
+dvc pull
+```
 
 ### Run the full pipeline
 ```bash
@@ -107,6 +139,7 @@ dvc push
 
 ## Experiment Tracking
 
+- **GitHub Repo**: [mlops_project](https://github.com/Abdelrahman-Farouk88/mlops_project)
 - **MLflow UI**: [DagsHub MLflow](https://dagshub.com/Abdelrahman-Farouk88/mlops_project.mlflow)
 - **DagsHub Repo**: [mlops_project](https://dagshub.com/Abdelrahman-Farouk88/mlops_project)
 
