@@ -107,11 +107,6 @@ dvc pull
 dvc repro
 ```
 
-### Run prediction (CLI)
-```bash
-python prediction.py
-```
-
 ### Launch the web interface
 ```bash
 streamlit run app.py
