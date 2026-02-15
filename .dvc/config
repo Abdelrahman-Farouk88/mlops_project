@@ -1,4 +1,4 @@
 [core]
     remote = myremote
 ['remote "myremote"']
-    url = C:\Users\abdoh\AppData\Local\Temp\dvc
+    url = https://dagshub.com/Abdelrahman-Farouk88/mlops_project.dvc
