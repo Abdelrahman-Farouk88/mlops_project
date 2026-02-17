@@ -76,8 +76,12 @@ target/
 # Jupyter NB Checkpoints
 .ipynb_checkpoints/
 
-# exclude data from source control by default
-/data/
+# Exclude the actual large data files
+/data/*
+
+# EXCEPTION: Allow Git to see the DVC pointers and ignore files
+!/data/**/.gitignore
+!/data/**/*.dvc
 
 # Mac OS-specific storage files
 .DS_Store
