@@ -12,9 +12,7 @@ import mlflow.sklearn
 import os
 from mlflow.models import infer_signature
 
-
-# Configure MLflow tracking URI using DAGSHUB credentials when available.
-# This avoids relying on dagshub.init() behavior and is explicit about auth.
+# --- Configure MLflow tracking URI using DAGSHUB credentials when available.
 REPO_OWNER = "Abdelrahman-Farouk88"
 REPO_NAME = "mlops_project"
 
@@ -24,9 +22,15 @@ dagshub_token = os.getenv("DAGSHUB_TOKEN")
 if dagshub_user and dagshub_token:
     # embed credentials into the MLflow URI so mlflow operations authenticate
     mlflow_tracking_uri = f"https://{dagshub_user}:{dagshub_token}@dagshub.com/{REPO_OWNER}/{REPO_NAME}.mlflow"
+    print("Using DagsHub MLflow tracking URI (with auth).")
 else:
-    # fallback (no auth)
-    mlflow_tracking_uri = f"https://dagshub.com/{REPO_OWNER}/{REPO_NAME}.mlflow"
+    # fallback to local mlruns for dev to avoid 403
+    local_mlruns = os.path.abspath("mlruns")
+    mlflow_tracking_uri = f"file://{local_mlruns}"
+    print(f"DAGSHUB credentials not found. Falling back to local tracking at {local_mlruns}")
+
+print("DEBUG: DAGSHUB_USERNAME present:", bool(dagshub_user))
+print("DEBUG: DAGSHUB_TOKEN present:", bool(dagshub_token))
 
 mlflow.set_tracking_uri(mlflow_tracking_uri)
 mlflow.set_experiment("DVC PIPELINE")
@@ -114,7 +118,8 @@ def main():
         test_data_path = "./data/processed/test_processed.csv"
         model_path = "models/model.pkl"
         metrics_path = "reports/metrics.json"
-        model_name = "Best Model"
+        # Use a single consistent artifact name (no spaces)
+        model_name = "Best_Model"
 
         test_data = load_data(test_data_path)
         X_test, y_test = prepare_data(test_data)
@@ -127,22 +132,25 @@ def main():
             mlflow.log_artifact(model_path)
             mlflow.log_artifact(metrics_path)
 
+            # optional: log this script path
             mlflow.log_artifact(__file__)
 
             signature = infer_signature(X_test, model.predict(X_test))
 
+            # log model under the same artifact name used above
             mlflow.sklearn.log_model(
                 sk_model=model,
-                name="Best_Model",
+                name=model_name,
                 signature=signature
             )
 
-            run_info = {'run_id': run.info.run_id, 'model_name': "Best_Model"}
+            run_info = {'run_id': run.info.run_id, 'model_name': model_name}
             reports_path = "reports/run_info.json"
             with open(reports_path, 'w') as file:
                 json.dump(run_info, file, indent=4)
 
     except Exception as e:
+        # Raise a clearer exception for troubleshooting
         raise Exception(f"An Error occurred: {e}")
 
 

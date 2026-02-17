@@ -3,6 +3,10 @@ stages:
   data_collection:
     cmd: python src/data/data_collection.py
     deps:
+    - path: data/external/water_potability.csv
+      hash: md5
+      md5: a5eeae83d792e40da6c2f9e1eab945fc
+      size: 525187
     - path: src/data/data_collection.py
       hash: md5
       md5: 070d4f85865a206018f851de05c1b7a7
