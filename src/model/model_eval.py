@@ -18,8 +18,7 @@ from mlflow.models import infer_signature
 dagshub.init(
     repo_owner='Abdelrahman-Farouk88',
     repo_name='mlops_project',
-    mlflow=True,
-    token=os.getenv("DAGSHUB_TOKEN")
+    mlflow=True
 )
 
 
