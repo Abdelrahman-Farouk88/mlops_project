@@ -39,7 +39,7 @@ def main():
         test_processed_data = fill_missing_with_mean(test_data)
 
 
-        os.makedirs(processed_data_path)
+        os.makedirs(processed_data_path, exist_ok=True)
 
         save_data(train_processed_data,os.path.join(processed_data_path,"train_processed.csv"))
         save_data(test_processed_data,os.path.join(processed_data_path,"test_processed.csv"))

@@ -59,12 +59,12 @@ with mlflow.start_run(run_name="Random Forest Tuning") as parent_run:
     best_rf = random_search.best_estimator_
     best_rf.fit(X_train, y_train)
 
-    pickle.dump(best_rf, open("model.pkl", "wb"))
+    pickle.dump(best_rf, open("models/model.pkl", "wb"))
 
     X_test = test_processed_data.drop(columns=["Potability"], axis=1)  
     y_test = test_processed_data["Potability"]  
 
-    model = pickle.load(open('model.pkl', "rb"))
+    model = pickle.load(open('models/model.pkl', "rb"))
 
     y_pred = model.predict(X_test)
 

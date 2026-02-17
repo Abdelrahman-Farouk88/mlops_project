@@ -10,7 +10,6 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from mlflow import log_metric, log_param, log_artifact
 import mlflow.sklearn
 import dagshub
-import mlflow
 from mlflow.models import infer_signature
 
 dagshub.init(repo_owner='Abdelrahman-Farouk88', repo_name='mlops_project', mlflow=True)
@@ -71,8 +70,9 @@ def evaluation_model(model, X_test: pd.DataFrame, y_test: pd.Series, model_name:
         plt.xlabel("Predicted")
         plt.ylabel("Actual")
         plt.title(f"Confusion Matrix for {model_name}")
-        cm_path = f"confusion_matrix_{model_name.replace(' ', '_')}.png"
+        cm_path = f"reports/figures/confusion_matrix_{model_name.replace(' ', '_')}.png"
         plt.savefig(cm_path)
+        plt.close()
         
         mlflow.log_artifact(cm_path)
         

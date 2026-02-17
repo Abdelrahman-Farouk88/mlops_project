@@ -57,7 +57,7 @@ with mlflow.start_run(run_name="Water Potability Models Experiment"):
         with mlflow.start_run(run_name=model_name, nested=True):
             model.fit(X_train, y_train)
             
-            model_filename = f"{model_name.replace(' ', '_')}.pkl"
+            model_filename = f"models/{model_name.replace(' ', '_')}.pkl"
             pickle.dump(model, open(model_filename, "wb"))
             
             y_pred = model.predict(X_test)
@@ -78,9 +78,9 @@ with mlflow.start_run(run_name="Water Potability Models Experiment"):
             plt.xlabel("Predicted")
             plt.ylabel("Actual")
             plt.title(f"Confusion Matrix for {model_name}")
-            plt.savefig(f"confusion_matrix_{model_name.replace(' ', '_')}.png")  
+            plt.savefig(f"reports/figures/confusion_matrix_{model_name.replace(' ', '_')}.png")  
             
-            mlflow.log_artifact(f"confusion_matrix_{model_name.replace(' ', '_')}.png")
+            mlflow.log_artifact(f"reports/figures/confusion_matrix_{model_name.replace(' ', '_')}.png")
             
             mlflow.sklearn.log_model(model, model_name.replace(' ', '_'))
     

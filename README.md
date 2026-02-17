@@ -29,6 +29,7 @@ This project predicts whether water is **safe to drink** based on 9 water qualit
 │   └── processed/         <- Preprocessed data
 ├── models/                <- Trained model artifacts
 ├── reports/               <- Metrics and run info
+│   ├── figures/           <- Confusion matrix plots
 │   ├── metrics.json
 │   └── run_info.json
 ├── src/
