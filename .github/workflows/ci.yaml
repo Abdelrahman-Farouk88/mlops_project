@@ -20,6 +20,10 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Uninstall old dagshub
+        run: |
+          pip uninstall -y dagshub || true
+
       - name: Install dependencies
         run: |
           pip install --upgrade pip
