@@ -10,9 +10,17 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from mlflow import log_metric, log_param, log_artifact
 import mlflow.sklearn
 import dagshub
+import os
 from mlflow.models import infer_signature
 
 dagshub.init(repo_owner='Abdelrahman-Farouk88', repo_name='mlops_project', mlflow=True)
+
+dagshub.init(
+    repo_owner='Abdelrahman-Farouk88',
+    repo_name='mlops_project',
+    mlflow=True,
+    token=os.getenv("DAGSHUB_TOKEN")
+)
 
 
 mlflow.set_experiment("DVC PIPELINE ")
