@@ -13,7 +13,7 @@ import dagshub
 import os
 from mlflow.models import infer_signature
 
-dagshub.init(repo_owner='Abdelrahman-Farouk88', repo_name='mlops_project', mlflow=True)
+
 
 dagshub.init(
     repo_owner='Abdelrahman-Farouk88',
