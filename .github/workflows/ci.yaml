@@ -7,6 +7,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
+      # MLflow credentials for tracking experiments
       MLFLOW_TRACKING_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
       MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_TOKEN }}
 
@@ -29,9 +30,10 @@ jobs:
           DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
           DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
         run: |
-          dvc remote modify origin --local auth basic
-          dvc remote modify origin --local user $DAGSHUB_USERNAME
-          dvc remote modify origin --local password $DAGSHUB_TOKEN
+          # Use 'myremote' to match your .dvc/config file
+          dvc remote modify myremote --local auth basic
+          dvc remote modify myremote --local user $DAGSHUB_USERNAME
+          dvc remote modify myremote --local password $DAGSHUB_TOKEN
           dvc pull
 
       - name: Ensure output directories exist
