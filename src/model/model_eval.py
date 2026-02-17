@@ -146,7 +146,6 @@ def main():
             signature = infer_signature(X_test, model.predict(X_test))
             mlflow.sklearn.log_model(
                 sk_model=model,
-                name=model_name,
                 signature=signature
             )
 
