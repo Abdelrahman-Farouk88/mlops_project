@@ -9,23 +9,27 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 from mlflow import log_metric, log_param, log_artifact
 import mlflow.sklearn
-import dagshub
 import os
 from mlflow.models import infer_signature
 
 
+# Configure MLflow tracking URI using DAGSHUB credentials when available.
+# This avoids relying on dagshub.init() behavior and is explicit about auth.
+REPO_OWNER = "Abdelrahman-Farouk88"
+REPO_NAME = "mlops_project"
 
-dagshub.init(
-    repo_owner='Abdelrahman-Farouk88',
-    repo_name='mlops_project',
-    mlflow=True
-)
+dagshub_user = os.getenv("DAGSHUB_USERNAME")
+dagshub_token = os.getenv("DAGSHUB_TOKEN")
 
+if dagshub_user and dagshub_token:
+    # embed credentials into the MLflow URI so mlflow operations authenticate
+    mlflow_tracking_uri = f"https://{dagshub_user}:{dagshub_token}@dagshub.com/{REPO_OWNER}/{REPO_NAME}.mlflow"
+else:
+    # fallback (no auth)
+    mlflow_tracking_uri = f"https://dagshub.com/{REPO_OWNER}/{REPO_NAME}.mlflow"
 
-mlflow.set_experiment("DVC PIPELINE ")
-
-mlflow.set_tracking_uri("https://dagshub.com/Abdelrahman-Farouk88/mlops_project.mlflow")  
-
+mlflow.set_tracking_uri(mlflow_tracking_uri)
+mlflow.set_experiment("DVC PIPELINE")
 
 
 def load_data(filepath: str) -> pd.DataFrame:
@@ -33,6 +37,7 @@ def load_data(filepath: str) -> pd.DataFrame:
         return pd.read_csv(filepath)
     except Exception as e:
         raise Exception(f"Error loading data from {filepath}: {e}")
+
 
 def prepare_data(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
     try:
@@ -42,6 +47,7 @@ def prepare_data(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
     except Exception as e:
         raise Exception(f"Error preparing data: {e}")
 
+
 def load_model(filepath: str):
     try:
         with open(filepath, "rb") as file:
@@ -50,27 +56,28 @@ def load_model(filepath: str):
     except Exception as e:
         raise Exception(f"Error loading model from {filepath}: {e}")
 
+
 def evaluation_model(model, X_test: pd.DataFrame, y_test: pd.Series, model_name: str) -> dict:
     try:
         params = yaml.safe_load(open("params.yaml", "r"))
         test_size = params["data_collection"]["test_size"]
         n_estimators = params["model_building"]["n_estimators"]
-        
+
         y_pred = model.predict(X_test)
 
         acc = accuracy_score(y_test, y_pred)
         precision = precision_score(y_test, y_pred)
         recall = recall_score(y_test, y_pred)
         f1 = f1_score(y_test, y_pred)
-        
-        mlflow.log_param("Test_size",test_size)
-        mlflow.log_param("n_estimators",n_estimators) 
+
+        mlflow.log_param("Test_size", test_size)
+        mlflow.log_param("n_estimators", n_estimators)
 
         mlflow.log_metric("accuracy", acc)
         mlflow.log_metric("precision", precision)
         mlflow.log_metric("recall", recall)
         mlflow.log_metric("f1_score", f1)
-        
+
         cm = confusion_matrix(y_test, y_pred)
         plt.figure(figsize=(5, 5))
         sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
@@ -80,9 +87,8 @@ def evaluation_model(model, X_test: pd.DataFrame, y_test: pd.Series, model_name:
         cm_path = f"reports/figures/confusion_matrix_{model_name.replace(' ', '_')}.png"
         plt.savefig(cm_path)
         plt.close()
-        
+
         mlflow.log_artifact(cm_path)
-        
 
         metrics_dict = {
             'accuracy': acc,
@@ -94,12 +100,14 @@ def evaluation_model(model, X_test: pd.DataFrame, y_test: pd.Series, model_name:
     except Exception as e:
         raise Exception(f"Error evaluating model: {e}")
 
+
 def save_metrics(metrics: dict, metrics_path: str) -> None:
     try:
         with open(metrics_path, 'w') as file:
             json.dump(metrics, file, indent=4)
     except Exception as e:
         raise Exception(f"Error saving metrics to {metrics_path}: {e}")
+
 
 def main():
     try:
@@ -118,7 +126,7 @@ def main():
 
             mlflow.log_artifact(model_path)
             mlflow.log_artifact(metrics_path)
-            
+
             mlflow.log_artifact(__file__)
 
             signature = infer_signature(X_test, model.predict(X_test))
@@ -136,6 +144,7 @@ def main():
 
     except Exception as e:
         raise Exception(f"An Error occurred: {e}")
+
 
 if __name__ == "__main__":
     main()
