@@ -1,4 +1,5 @@
 import json
+from dotenv import load_dotenv
 import os
 import sys
 from urllib.parse import urlparse, urlunparse
@@ -7,6 +8,7 @@ import mlflow
 from mlflow.tracking import MlflowClient
 import mlflow.exceptions
 
+load_dotenv()
 # Configure tracking URI using DagsHub credentials when available
 REPO_OWNER = "Abdelrahman-Farouk88"
 REPO_NAME = "mlops_project"

@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 import json
 import pickle
 import yaml
@@ -17,6 +18,10 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 REPO_OWNER = "Abdelrahman-Farouk88"
 REPO_NAME = "mlops_project"
 
+dagshub_token = os.getenv("DAGSHUB_TOKEN")
+
+# Load environment variables from .env if present
+load_dotenv()
 dagshub_user = os.getenv("DAGSHUB_USERNAME")
 dagshub_token = os.getenv("DAGSHUB_TOKEN")
 
