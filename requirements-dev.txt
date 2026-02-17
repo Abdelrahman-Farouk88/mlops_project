@@ -1,0 +1,8 @@
+# Dev, docs, web, testing
+Sphinx
+coverage
+flake8
+streamlit
+fastapi
+uvicorn
+...existing code...

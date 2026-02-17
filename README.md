@@ -22,7 +22,8 @@ This project predicts whether water is **safe to drink** based on 9 water qualit
 ├── prediction.py          <- CLI prediction script
 ├── dvc.yaml               <- DVC pipeline definition
 ├── params.yaml            <- Model/data parameters
-├── requirements.txt       <- Python dependencies
+├── requirements.txt       <- Pipeline dependencies (core)
+├── requirements-dev.txt   <- Dev/docs/web dependencies
 ├── data/
 │   ├── external/          <- Raw source data (water_potability.csv)
 │   ├── raw/               <- Train/test split
@@ -65,8 +66,11 @@ python -m venv myenv
 myenv\Scripts\activate  # Windows
 # source myenv/bin/activate  # Linux/Mac
 
-# Install dependencies
+# Install core pipeline dependencies
 pip install -r requirements.txt
+
+# (Optional) For development, docs, or web interface:
+pip install -r requirements-dev.txt
 ```
 
 ## DagsHub Configuration

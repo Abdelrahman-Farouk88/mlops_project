@@ -28,6 +28,7 @@ stages:
     cmd: python src/model/model_eval.py
     deps:
     - models/model.pkl
+    - data/processed/test_processed.csv
     - src/model/model_eval.py
     metrics:
     - reports/metrics.json

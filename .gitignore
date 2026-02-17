@@ -1,3 +1,6 @@
+# DVC & secrets
+.dvc/config.local
+.env
 myenv
 # Byte-compiled / optimized / DLL files
 __pycache__/

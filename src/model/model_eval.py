@@ -14,13 +14,11 @@ from mlflow.models import infer_signature
 
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 
-# --- MLflow tracking configuration (DagsHub when credentials available, local fallback otherwise) ---
 REPO_OWNER = "Abdelrahman-Farouk88"
 REPO_NAME = "mlops_project"
 
 dagshub_token = os.getenv("DAGSHUB_TOKEN")
 
-# Load environment variables from .env if present
 load_dotenv()
 dagshub_user = os.getenv("DAGSHUB_USERNAME")
 dagshub_token = os.getenv("DAGSHUB_TOKEN")
@@ -30,11 +28,9 @@ if dagshub_user and dagshub_token:
     mlflow_tracking_uri = f"https://{dagshub_user}:{dagshub_token}@dagshub.com/{REPO_OWNER}/{REPO_NAME}.mlflow"
     print("Using DagsHub MLflow tracking URI (with auth).")
 else:
-    # Local dev fallback -> keep experiments in ./mlruns
     local_mlruns = os.path.abspath("mlruns")
     os.makedirs(local_mlruns, exist_ok=True)
     if os.name == "nt":
-        # On Windows use a filesystem path (no file://) to avoid MLflow rejecting it as a remote URI
         mlflow_tracking_uri = local_mlruns
     else:
         mlflow_tracking_uri = f"file://{local_mlruns}"
@@ -45,7 +41,6 @@ print("DEBUG: DAGSHUB_TOKEN present:", bool(dagshub_token))
 
 mlflow.set_tracking_uri(mlflow_tracking_uri)
 mlflow.set_experiment("DVC PIPELINE")
-# --- end MLflow config ---
 
 def load_data(filepath: str) -> pd.DataFrame:
     try:
@@ -93,7 +88,6 @@ def evaluation_model(model, X_test: pd.DataFrame, y_test: pd.Series, model_name:
         mlflow.log_metric("recall", recall)
         mlflow.log_metric("f1_score", f1)
 
-        # Ensure reports/figures directory exists
         figures_dir = os.path.join("reports", "figures")
         os.makedirs(figures_dir, exist_ok=True)
 
@@ -135,7 +129,6 @@ def main():
         test_data_path = "./data/processed/test_processed.csv"
         model_path = "models/model.pkl"
         metrics_path = "reports/metrics.json"
-        # Use a single consistent artifact name (no spaces)
         model_name = "Best_Model"
 
         test_data = load_data(test_data_path)
@@ -146,12 +139,10 @@ def main():
             metrics = evaluation_model(model, X_test, y_test, model_name)
             save_metrics(metrics, metrics_path)
 
-            # log artifacts
             mlflow.log_artifact(model_path)
             mlflow.log_artifact(metrics_path)
             mlflow.log_artifact(__file__)
 
-            # infer signature and log model under the same artifact name
             signature = infer_signature(X_test, model.predict(X_test))
             mlflow.sklearn.log_model(
                 sk_model=model,
@@ -166,7 +157,6 @@ def main():
                 json.dump(run_info, file, indent=4)
 
     except Exception as e:
-        # Raise a clearer exception for troubleshooting
         raise Exception(f"An Error occurred: {e}")
 
 
