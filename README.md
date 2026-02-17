@@ -133,6 +133,24 @@ streamlit run app.py
 - **MLflow UI**: [DagsHub MLflow](https://dagshub.com/Abdelrahman-Farouk88/mlops_project.mlflow)
 - **DagsHub Repo**: [mlops_project](https://dagshub.com/Abdelrahman-Farouk88/mlops_project)
 
+## Continuous Integration (CI)
+
+This project uses GitHub Actions for CI. On every push, the pipeline:
+- Installs dependencies
+- Pulls DVC-tracked data from remote
+- Ensures output directories exist
+- Runs the DVC pipeline
+
+**Troubleshooting DVC in CI:**
+If you see errors like `failed to pull data from the cloud` or `missing cache files`, make sure you have run `dvc push` locally to upload all tracked files to your DVC remote. CI can only pull files that exist in the remote storage.
+
+**Secrets:**
+- Add your DagsHub username and token as GitHub repository secrets:
+  - `DAGSHUB_USERNAME`
+  - `DAGSHUB_TOKEN`
+
+See `.github/workflows/ci.yaml` for details.
+
 ## License
 
 See [LICENSE](LICENSE) for details.
