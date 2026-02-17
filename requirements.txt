@@ -19,6 +19,8 @@ pyyaml
 
 # MLOps
 mlflow
+urllib3
+six
 dagshub
 dvc
 
