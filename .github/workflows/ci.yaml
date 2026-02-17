@@ -23,6 +23,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
+          pip install --upgrade dagshub
           pip install -r requirements.txt
 
       - name: Pull DVC data
