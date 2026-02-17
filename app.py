@@ -42,6 +42,7 @@ def load_model():
     return model, version
 
 
+
 model_data = load_model()
 
 if model_data:
