@@ -12,6 +12,7 @@ import os
 dagshub.init(repo_owner='Abdelrahman-Farouk88', repo_name='mlops_project', mlflow=True)
 
 
+
 mlflow.set_experiment("Experiment 4")
 
 mlflow.set_tracking_uri("https://dagshub.com/Abdelrahman-Farouk88/mlops_project.mlflow")  
