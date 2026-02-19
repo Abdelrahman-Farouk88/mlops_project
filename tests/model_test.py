@@ -60,7 +60,51 @@ class TestModelLoading(unittest.TestCase):
 
         print(f"Model successfully loaded from {logged_model}.")
 
-    
+
+    def test_model_performance(self):
+
+        client = MlflowClient()
+
+        versions = client.get_latest_versions(model_name, stage = ["Staging"])
+
+        if not versions:
+            self.fail("No model found in the 'Staging' stage, skipping performance test.")
+
+            latest_version = versions[0].run_id
+            logged_model = f'runs://{latest_version}/{model_name}'
+            loaded_model = mlflow.pyfunc.load_model(logged_model)
+
+            test_data_path = "./data/processed/test_processed.csv"
+
+            if not os.path.exists(test_data_path):
+                self.fail(f"Test data not found at {test_data_path}")
+
+            test_data = pd.read_csv(test_data_path)
+            X_test = test_data.drop(columns=["Potability"])
+            y_test = test_data["Potability"]
+
+            predictions = loaded_model.predict(X_test)
+
+            accuracy = accuracy_score(y_test, predictions)
+
+            precision = precision_score(y_test, predictions, average="binary")
+            recall = recall_score(y_test, predictions, average="binary")
+            f1 = f1_score(y_test, predictions, average="binary")
+
+            print(f"Accuracy: {accuracy}")
+
+            print(f"Precision) {precision}")
+
+            print(f"Recall: {recall}")
+
+            print(f"F1 Score: {f1}")
+
+            self.assertGreaterEqual(accuracy, 0.3, "Accuracy is below threshold.")
+            self.assertGreaterEqual (precision, 0.3, "Precision is below threshold.")
+            self.assertGreaterEqual(recall, 0.3, "Recall is below threshold.")
+            self.assertGreaterEqual(f1, 0.3, "F1 Score is below threshold.")
+
+
 if __name__ == "__main__":
     
     unittest.main()
