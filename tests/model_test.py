@@ -46,7 +46,7 @@ class TestModelLoading(unittest.TestCase):
 
         run_id = versions[0].run_id
 
-        logged_model = f'runs://{run_id}/{model_name}'
+        logged_model = f'runs:/{run_id}/{model_name}'
         
 
         try:
@@ -71,7 +71,7 @@ class TestModelLoading(unittest.TestCase):
             self.fail("No model found in the 'Staging' stage, skipping performance test.")
 
             latest_version = versions[0].run_id
-            logged_model = f'runs://{latest_version}/{model_name}'
+            logged_model = f'runs:/{latest_version}/{model_name}'
             loaded_model = mlflow.pyfunc.load_model(logged_model)
 
             test_data_path = "./data/processed/test_processed.csv"
