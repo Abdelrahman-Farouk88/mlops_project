@@ -65,7 +65,7 @@ class TestModelLoading(unittest.TestCase):
 
         client = MlflowClient()
 
-        versions = client.get_latest_versions(model_name, stage = ["Staging"])
+        versions = client.get_latest_versions(model_name, stages = ["Staging"])
 
         if not versions:
             self.fail("No model found in the 'Staging' stage, skipping performance test.")
