@@ -74,7 +74,7 @@ def setup_mlflow_tracking() -> str:
     print("DEBUG: DAGSHUB_TOKEN present:", bool(dagshub_token))
 
     mlflow.set_tracking_uri(tracking_uri)
-    mlflow.set_experiment(EXPERIMENT_NAME)
+    mlflow.set_experiment("DVC CI Pipeline")
 
     return tracking_uri
 

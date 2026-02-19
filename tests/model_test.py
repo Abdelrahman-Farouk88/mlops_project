@@ -21,7 +21,7 @@ repo_name = "mlops_project"
 
 mlflow.set_tracking_uri(f"{dagshub_url}/{repo_owner}/{repo_name}.mlflow")
 
-model_name = "Best Modlel"
+model_name = "Best Model"
 
 class TestModelLoading(unittest.TestCase):
 
