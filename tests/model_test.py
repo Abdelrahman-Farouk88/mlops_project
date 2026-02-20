@@ -45,6 +45,7 @@ class TestModelLoading(unittest.TestCase):
         latest_version = versions[0].version
 
         run_id = versions[0].run_id
+        
 
         logged_model = f'runs:/{run_id}/{model_name}'
         
