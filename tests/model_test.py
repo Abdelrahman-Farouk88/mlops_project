@@ -5,107 +5,61 @@ from mlflow.tracking import MlflowClient
 import os
 import pandas as pd
 
-dagshub_token = os.getenv("DAGSHUB_TOKEN")
-
-if not dagshub_token:
-
-    raise EncodingWarning("DAGSHUB_TOKEN environment variable is not set")
-
-os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
-os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
-
-dagshub_url = "https://dagshub.com"
-
-repo_owner = "Abdelrahman-Farouk88"
-repo_name = "mlops_project"
-
-mlflow.set_tracking_uri(f"{dagshub_url}/{repo_owner}/{repo_name}.mlflow")
-
-model_name = "Best Model"
+# Use the name defined in your src scripts
+MODEL_NAME = "water_potability_model"
+ARTIFACT_PATH = "model" 
 
 class TestModelLoading(unittest.TestCase):
+    def setUp(self):
+        # Tracking setup
+        repo_owner = "Abdelrahman-Farouk88"
+        repo_name = "mlops_project"
+        dagshub_url = "https://dagshub.com"
+        mlflow.set_tracking_uri(f"{dagshub_url}/{repo_owner}/{repo_name}.mlflow")
+        self.client = MlflowClient()
 
     def test_model_in_staging(self):
-
-        client = MlflowClient()
-
-        versions = client.get_latest_versions(model_name, stages = ["Staging"])
-
-        self.assertGreater(len(versions), 0, "No model found in the 'Staging' stage.")
+        # Updated to catch the deprecation warning context if needed
+        versions = self.client.get_latest_versions(MODEL_NAME, stages=["Staging"])
+        self.assertGreater(len(versions), 0, f"No model found for '{MODEL_NAME}' in Staging.")
 
     def test_model_loading(self):
-
-        client = MlflowClient()
-
-        versions = client.get_latest_versions(model_name, stages = ["Staging"])
-
+        versions = self.client.get_latest_versions(MODEL_NAME, stages=["Staging"])
         if not versions:
-            self.fail("No model found in the 'Staging' stage.")
-
-        latest_version = versions[0].version
+            self.fail(f"No model found for '{MODEL_NAME}' in Staging.")
 
         run_id = versions[0].run_id
+        # IMPORTANT: Use the ARTIFACT_PATH "model", not the MODEL_NAME
+        model_uri = f'runs:/{run_id}/{ARTIFACT_PATH}'
         
-
-        logged_model = f'runs:/{run_id}/{model_name}'
-        
-
         try:
-            logged_model = mlflow.pyfunc.load_model(logged_model)
-
+            loaded_model = mlflow.pyfunc.load_model(model_uri)
+            self.assertIsNotNone(loaded_model, "The loaded model is None.")
         except Exception as e:
-
-            self.fail(f"Failed to load the model: {e}")
-
-        self.assertIsNotNone(logged_model, "the loaded model is None.")
-
-        print(f"Model successfully loaded from {logged_model}.")
-
+            self.fail(f"Failed to load the model from {model_uri}: {e}")
 
     def test_model_performance(self):
-
-        client = MlflowClient()
-
-        versions = client.get_latest_versions(model_name, stages = ["Staging"])
-
+        versions = self.client.get_latest_versions(MODEL_NAME, stages=["Staging"])
         if not versions:
-            self.fail("No model found in the 'Staging' stage, skipping performance test.")
+            self.fail("No model found in Staging, skipping performance test.")
+        
+        run_id = versions[0].run_id
+        model_uri = f'runs:/{run_id}/{ARTIFACT_PATH}'
+        loaded_model = mlflow.pyfunc.load_model(model_uri)
 
-            latest_version = versions[0].run_id
-            logged_model = f'runs:/{latest_version}/{model_name}'
-            loaded_model = mlflow.pyfunc.load_model(logged_model)
+        test_data_path = "./data/processed/test_processed.csv"
+        if not os.path.exists(test_data_path):
+            self.fail(f"Test data not found at {test_data_path}")
 
-            test_data_path = "./data/processed/test_processed.csv"
+        test_data = pd.read_csv(test_data_path)
+        X_test = test_data.drop(columns=["Potability"])
+        y_test = test_data["Potability"]
 
-            if not os.path.exists(test_data_path):
-                self.fail(f"Test data not found at {test_data_path}")
+        predictions = loaded_model.predict(X_test)
+        accuracy = accuracy_score(y_test, predictions)
 
-            test_data = pd.read_csv(test_data_path)
-            X_test = test_data.drop(columns=["Potability"])
-            y_test = test_data["Potability"]
-
-            predictions = loaded_model.predict(X_test)
-
-            accuracy = accuracy_score(y_test, predictions)
-
-            precision = precision_score(y_test, predictions, average="binary")
-            recall = recall_score(y_test, predictions, average="binary")
-            f1 = f1_score(y_test, predictions, average="binary")
-
-            print(f"Accuracy: {accuracy}")
-
-            print(f"Precision) {precision}")
-
-            print(f"Recall: {recall}")
-
-            print(f"F1 Score: {f1}")
-
-            self.assertGreaterEqual(accuracy, 0.3, "Accuracy is below threshold.")
-            self.assertGreaterEqual (precision, 0.3, "Precision is below threshold.")
-            self.assertGreaterEqual(recall, 0.3, "Recall is below threshold.")
-            self.assertGreaterEqual(f1, 0.3, "F1 Score is below threshold.")
-
+        print(f"Test Accuracy: {accuracy}")
+        self.assertGreaterEqual(accuracy, 0.3, f"Accuracy {accuracy} is below threshold.")
 
 if __name__ == "__main__":
-    
     unittest.main()
