@@ -1,5 +1,5 @@
 import mlflow
-from mlflow.tracking import MlflowCliennt
+from mlflow.tracking import MlflowClient
 import os
 
 dagshub_token = os.getenv("DAGSHUB_TOKEN")
