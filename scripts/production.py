@@ -18,7 +18,7 @@ mlflow.set_tracking_uri(f"{dagshub_url}/{repo_owner}/{repo_name}.mlflow")
 model_name = "water_potability_model"
 
 def promote_model_to_production():
-    client = MlflowCliennt()
+    client = MlflowClient()
 
     staging_versions = client.get_latest_versions(model_name, stages = ["Staging"])
     if not staging_versions:
