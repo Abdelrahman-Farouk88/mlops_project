@@ -34,7 +34,7 @@ def promote_model_to_production():
         current_production_version = production_versions[0]
         production_version_number = current_production_version.version
 
-        client.tranisition_model_version_stage(
+        client.transition_model_version_stage(
             name = model_name,
             version = production_version_number,
             stage = "Archived",
@@ -46,7 +46,7 @@ def promote_model_to_production():
     else:
         print("No model currently in 'Production'")
 
-    client.tranisition_model_version_stage(
+    client.transition_model_version_stage(
             name = model_name,
             version = staging_version_number,
             stage = "Production",
