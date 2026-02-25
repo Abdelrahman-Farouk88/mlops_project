@@ -1,5 +1,14 @@
 # Water Potability Prediction — MLOps Project
 
+## Key Features
+
+- **End-to-end MLOps pipeline**: Data ingestion, preprocessing, model training, evaluation, registration, and promotion.
+- **API Backend**: FastAPI service for real-time predictions ([API/main.py](API/main.py)).
+- **Web Interface**: Streamlit frontend ([Interface/app.py](Interface/app.py)) for user-friendly predictions.
+- **CLI Prediction**: Command-line script ([prediction.py](prediction.py)) for quick model inference.
+- **Model Promotion**: Script ([scripts/production.py](scripts/production.py)) to automate model stage transitions.
+- **Testing**: Unit tests ([tests/model_test.py](tests/model_test.py)) for model loading and performance.
+
 An end-to-end MLOps pipeline for predicting water potability using Machine Learning, with experiment tracking, model versioning, and a web interface.
 
 ## Overview
@@ -18,8 +27,15 @@ This project predicts whether water is **safe to drink** based on 9 water qualit
 ## Project Structure
 
 ```
-├── app.py                 <- Streamlit web interface
+├── API/
+│   └── main.py            <- FastAPI backend for predictions
+├── Interface/
+│   └── app.py             <- Streamlit web interface
 ├── prediction.py          <- CLI prediction script
+├── scripts/
+│   └── production.py      <- Model promotion script
+├── tests/
+│   └── model_test.py      <- Model unit tests
 ├── dvc.yaml               <- DVC pipeline definition
 ├── params.yaml            <- Model/data parameters
 ├── requirements.txt       <- Pipeline dependencies (core)
@@ -29,7 +45,7 @@ This project predicts whether water is **safe to drink** based on 9 water qualit
 │   ├── raw/               <- Train/test split
 │   └── processed/         <- Preprocessed data
 ├── models/                <- Trained model artifacts
-├── reports/               <- Metrics and run info
+├── reports/
 │   ├── figures/           <- Confusion matrix plots
 │   ├── metrics.json
 │   └── run_info.json
@@ -100,6 +116,7 @@ export MLFLOW_TRACKING_USERNAME=<YOUR_DAGSHUB_USERNAME>
 export MLFLOW_TRACKING_PASSWORD=<YOUR_DAGSHUB_TOKEN>
 ```
 
+
 ## Usage
 
 ### Pull data from remote
@@ -114,7 +131,56 @@ dvc repro
 
 ### Launch the web interface
 ```bash
-streamlit run app.py
+streamlit run Interface/app.py
+```
+
+### Run the FastAPI backend
+```bash
+uvicorn API.main:app --reload
+```
+
+### Use the CLI prediction script
+```bash
+python prediction.py
+```
+
+### Promote model to Production stage
+```bash
+python scripts/production.py
+```
+
+### Run tests
+```bash
+python -m unittest tests/model_test.py
+```
+
+### API Usage Example
+
+**POST /predict**
+
+Send a JSON payload with water parameters to get a prediction:
+
+```json
+{
+  "ph": 7.0,
+  "Hardness": 200.0,
+  "Solids": 20000.0,
+  "Chloramines": 7.0,
+  "Sulfate": 330.0,
+  "Conductivity": 420.0,
+  "Organic_carbon": 14.0,
+  "Trihalomethanes": 66.0,
+  "Turbidity": 4.0
+}
+```
+
+**Response:**
+
+```json
+{
+  "prediction": 1,
+  "result": "Water is Potable (Safe to drink)"
+}
 ```
 
 ## Water Quality Parameters
