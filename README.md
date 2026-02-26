@@ -1,10 +1,12 @@
 # Water Potability Prediction — MLOps Project
 
-#
+
+
 ## Live Deployment
 
-- **API:** [Water Potability Prediction API](https://mlopsproject-production-067f.up.railway.app/)
+
 - **Web Interface:** [Water Potability Prediction App](https://mlopsproject-production-132d.up.railway.app/)
+- **API:** [Water Potability Prediction API](https://mlopsproject-production-067f.up.railway.app/)
 
 ---
 
@@ -167,10 +169,6 @@ streamlit run Interface/app.py
 uvicorn API.main:app --reload
 ```
 
-### Use the CLI prediction script
-```bash
-python prediction.py
-```
 
 ### Promote model to Production stage
 ```bash
@@ -191,7 +189,6 @@ The FastAPI backend is deployed at:
 ### Endpoints
 
 - `GET /` — Health message
-- `GET /health` — Health check
 - `POST /predict` — Predict potability
 
 #### Example: Predict Potability
@@ -220,22 +217,20 @@ Response:
 }
 ```
 
----
-#
-## Improvements & Limitations
 
-- **Improvements:**
-  - Add more model explainability (SHAP, feature importance)
-  - Enhance error handling in API and interface
-  - Add authentication for API endpoints
-  - Expand test coverage (integration, edge cases)
-  - Add CI/CD for automated deployment
+## Docker & Deployment
 
-- **Limitations:**
-  - Model trained only on provided dataset
-  - No input validation for extreme values
-  - No user authentication in web/API
-  - Limited to water potability prediction (single task)
+This project supports containerized deployment using Docker and Docker Compose:
+
+- **Dockerfile**: Builds the FastAPI backend container.
+- **Dockerfile.ui**: Builds the Streamlit web interface container.
+- **docker-compose.yml**: Orchestrates both containers for local or cloud deployment.
+
+To build and run locally:
+
+```bash
+docker-compose up --build
+```
 
 ---
 
