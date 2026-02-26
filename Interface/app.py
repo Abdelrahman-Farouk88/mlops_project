@@ -1,7 +1,9 @@
 import streamlit as st
 import requests
+import os
 
-API_URL = "http://127.0.0.1:8000/predict"  # Change after deployment
+
+API_URL = os.getenv("API_URL", "http://api:8000/predict")  # Change after deployment
 
 st.set_page_config(
     page_title="Water Potability Prediction",
