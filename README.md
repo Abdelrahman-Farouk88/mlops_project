@@ -1,5 +1,23 @@
 # Water Potability Prediction — MLOps Project
 
+#
+## Live Deployment
+
+- **API:** [Water Potability Prediction API](https://mlopsproject-production-067f.up.railway.app/)
+- **Web Interface:** [Water Potability Prediction App](https://mlopsproject-production-132d.up.railway.app/)
+
+---
+
+## Project Summary
+
+This project is an end-to-end MLOps pipeline for predicting water potability using a Random Forest classifier. It includes:
+- Automated data processing and model training with DVC
+- Experiment tracking and model registry with MLflow/DagsHub
+- Real-time predictions via FastAPI
+- User-friendly web interface via Streamlit
+- CLI and scripts for model management
+- Unit tests for model loading and performance
+
 ## Key Features
 
 - **End-to-end MLOps pipeline**: Data ingestion, preprocessing, model training, evaluation, registration, and promotion.
@@ -117,6 +135,16 @@ export MLFLOW_TRACKING_PASSWORD=<YOUR_DAGSHUB_TOKEN>
 ```
 
 
+#
+## Web Interface Usage
+
+The Streamlit app is deployed at:
+> https://mlopsproject-production-132d.up.railway.app/
+
+Enter the 9 water quality parameters and click **Predict Potability** to get instant results on whether the water is safe to drink.
+
+---
+
 ## Usage
 
 ### Pull data from remote
@@ -153,6 +181,63 @@ python scripts/production.py
 ```bash
 python -m unittest tests/model_test.py
 ```
+
+#
+## API Usage (Live)
+
+The FastAPI backend is deployed at:
+> https://mlopsproject-production-067f.up.railway.app/
+
+### Endpoints
+
+- `GET /` — Health message
+- `GET /health` — Health check
+- `POST /predict` — Predict potability
+
+#### Example: Predict Potability
+
+Send a POST request to `/predict` with JSON body:
+
+```json
+{
+  "ph": 7.0,
+  "Hardness": 200.0,
+  "Solids": 20000.0,
+  "Chloramines": 7.0,
+  "Sulfate": 330.0,
+  "Conductivity": 420.0,
+  "Organic_carbon": 14.0,
+  "Trihalomethanes": 66.0,
+  "Turbidity": 4.0
+}
+```
+
+Response:
+
+```json
+{
+  "potable": 1
+}
+```
+
+---
+#
+## Improvements & Limitations
+
+- **Improvements:**
+  - Add more model explainability (SHAP, feature importance)
+  - Enhance error handling in API and interface
+  - Add authentication for API endpoints
+  - Expand test coverage (integration, edge cases)
+  - Add CI/CD for automated deployment
+
+- **Limitations:**
+  - Model trained only on provided dataset
+  - No input validation for extreme values
+  - No user authentication in web/API
+  - Limited to water potability prediction (single task)
+
+---
 
 ### API Usage Example
 

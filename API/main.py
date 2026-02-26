@@ -7,10 +7,6 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
-# ==============================
-# Initialize DagsHub + MLflow (Token-based)
-# ==============================
-
 repo_owner = os.getenv("DAGSHUB_USERNAME")
 repo_name = "mlops_project"
 token = os.getenv("DAGSHUB_TOKEN")
@@ -19,7 +15,6 @@ if repo_owner and token:
     try:
         import dagshub
 
-        # token-based auth (supported way)
         dagshub.auth.add_app_token(token)
 
         dagshub.init(
@@ -40,9 +35,6 @@ else:
     print("⚠️ DAGSHUB credentials not found — running offline mode")
 
 
-# ==============================
-# FastAPI App
-# ==============================
 
 app = FastAPI(
     title="Water Potability Prediction API",
@@ -52,16 +44,13 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8501"],  # change in production
+    allow_origins=["http://localhost:8501"],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
-# ==============================
-# Load Production Model (once)
-# ==============================
 
 model = None
 
@@ -92,13 +81,9 @@ def load_model():
         return None
 
 
-# load at startup (but failure won’t crash API)
 load_model()
 
 
-# ==============================
-# Request Schema
-# ==============================
 
 class Water(BaseModel):
     ph: float
@@ -112,9 +97,6 @@ class Water(BaseModel):
     Turbidity: float
 
 
-# ==============================
-# Routes
-# ==============================
 
 @app.get("/")
 def home():
