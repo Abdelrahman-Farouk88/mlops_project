@@ -1,6 +1,5 @@
 import os
 import mlflow
-import dagshub
 import pandas as pd
 
 from fastapi import FastAPI, HTTPException
@@ -8,85 +7,82 @@ from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
+# ======================================================
+# 1️⃣  Configure MLflow Remote Tracking (DagsHub)
+# ======================================================
+
 load_dotenv()
 
 repo_owner = os.getenv("DAGSHUB_USERNAME")
 repo_name = "mlops_project"
-token = os.getenv("DAGSHUB_TOKEN")
 
-if repo_owner and token:
-    try:
-        import dagshub
+if not repo_owner:
+    raise RuntimeError("DAGSHUB_USERNAME not set")
 
-        dagshub.auth.add_app_token(token)
+mlflow.set_tracking_uri(
+    f"https://dagshub.com/{repo_owner}/{repo_name}.mlflow"
+)
 
-        dagshub.init(
-            repo_owner=repo_owner,
-            repo_name=repo_name,
-            mlflow=True
-        )
-
-        mlflow.set_tracking_uri(
-            f"https://dagshub.com/{repo_owner}/{repo_name}.mlflow"
-        )
-
-        print("✅ Dagshub initialized successfully.")
-
-    except Exception as e:
-        print(f"❌ Dagshub init failed: {e}")
-else:
-    print("⚠️ DAGSHUB credentials not found — running offline mode")
+print("🚀 MLflow tracking URI configured.")
 
 
+# ======================================================
+# 2️⃣  Load Production Model From Registry
+# ======================================================
+
+try:
+    model = mlflow.pyfunc.load_model(
+        "models:/water_potability_model/Production"
+    )
+    print("✅ Production model loaded successfully.")
+except Exception as e:
+    print(f"❌ Failed to load model: {e}")
+    model = None
+
+
+# ======================================================
+# 3️⃣  FastAPI App
+# ======================================================
 
 app = FastAPI(
     title="Water Potability Prediction API",
     description="API to predict whether water is potable or not.",
-    version="1.0"
+    version="2.0"
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  
+    allow_origins=["*"],  # change in real production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
+# ======================================================
+# 4️⃣  Health Checks (Important for Leapcell)
+# ======================================================
 
-model = None
-
-def load_model():
-    global model
-
-    try:
-        client = mlflow.tracking.MlflowClient()
-
-        versions = client.get_latest_versions(
-            name="water_potability_model",
-            stages=["Production"]
-        )
-
-        if not versions:
-            print("⚠️ No Production model found in MLflow.")
-            return None
-
-        run_id = versions[0].run_id
-
-        model = mlflow.pyfunc.load_model(f"runs:/{run_id}/model")
-
-        print("✅ Production model loaded successfully.")
-        return model
-
-    except Exception as e:
-        print(f"❌ Error loading model: {e}")
-        return None
+@app.get("/")
+def home():
+    return {"message": "Water Potability API is running 🚀"}
 
 
-load_model()
+@app.get("/health")
+def health():
+    return {"status": "healthy"}
 
 
+# Leapcell tries these:
+@app.get("/kaithhealthcheck")
+@app.get("/kaithheathcheck")
+def leapcell_health():
+    return {"status": "ok"}
+
+
+# ======================================================
+# 5️⃣  Input Schema
+# ======================================================
 
 class Water(BaseModel):
     ph: float
@@ -100,24 +96,17 @@ class Water(BaseModel):
     Turbidity: float
 
 
-
-@app.get("/")
-def home():
-    return {"message": "Water Potability Prediction API is running 🚀"}
-
-
-@app.get("/health")
-def health_check():
-    return {"status": "healthy"}
-
+# ======================================================
+# 6️⃣  Prediction Endpoint
+# ======================================================
 
 @app.post("/predict")
 def predict(water: Water):
 
-    try:
-        if model is None:
-            raise HTTPException(status_code=503, detail="Model not loaded")
+    if model is None:
+        raise HTTPException(status_code=503, detail="Model not loaded")
 
+    try:
         sample = pd.DataFrame({
             "ph": [water.ph],
             "Hardness": [water.Hardness],
@@ -135,8 +124,11 @@ def predict(water: Water):
 
         return {
             "prediction": result,
-            "result": "Water is Potable (Safe to drink)" if result == 1
-            else "Water is NOT Potable (Not safe to drink)"
+            "result": (
+                "Water is Potable (Safe to drink)"
+                if result == 1
+                else "Water is NOT Potable (Not safe to drink)"
+            )
         }
 
     except Exception as e:
