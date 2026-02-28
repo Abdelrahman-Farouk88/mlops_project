@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import mlflow
+import threading
 from dotenv import load_dotenv
 
 from fastapi import FastAPI, HTTPException
@@ -22,12 +23,7 @@ if ENV == "development" and repo_owner and token:
         import dagshub
 
         dagshub.auth.add_app_token(token)
-
-        dagshub.init(
-            repo_owner=repo_owner,
-            repo_name=repo_name,
-            mlflow=True
-        )
+        dagshub.init(repo_owner=repo_owner, repo_name=repo_name, mlflow=True)
 
         tracking_uri = f"https://dagshub.com/{repo_owner}/{repo_name}.mlflow"
         mlflow.set_tracking_uri(tracking_uri)
@@ -59,6 +55,7 @@ model = None
 
 
 def load_model():
+    print("Starting model loading..................................................................")
     global model
 
     try:
@@ -72,29 +69,31 @@ def load_model():
 
             if not versions:
                 print("No Production model found in registry.")
-                return None
+                return
 
             run_id = versions[0].run_id
             model = mlflow.pyfunc.load_model(f"runs:/{run_id}/model")
 
             print("Model loaded from MLflow (dev)")
-            return model
 
         else:
             if os.path.exists("model"):
                 model = mlflow.pyfunc.load_model("model")
                 print("Model loaded from local artifact (prod)")
-                return model
-
-            print("No local model artifact found in production")
-            return None
+            else:
+                print("No local model artifact found in production")
 
     except Exception as e:
         print(f"Error loading model: {e}")
-        return None
+    
+    print("🚀 Starting background model loading............................................................")
+    
 
 
-load_model()
+@app.on_event("startup")
+def startup():
+    print("🚀 Starting background model loading")
+    threading.Thread(target=load_model).start()
 
 
 class Water(BaseModel):
