@@ -6,6 +6,9 @@ import pandas as pd
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
+
+load_dotenv()
 
 repo_owner = os.getenv("DAGSHUB_USERNAME")
 repo_name = "mlops_project"

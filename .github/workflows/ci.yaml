@@ -58,5 +58,5 @@ jobs:
       - name: Promote model to production
         if: success()
         env:
-          DDAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+          DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
         run: python scripts/production.py
